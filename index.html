@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robo Ayu - Discord Bot Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050912; color: #f3f4f6; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #050912; }
+    ::-webkit-scrollbar-thumb { background: #232936; border-radius: 4px; }
+    .card { background: linear-gradient(135deg, #0a1d42 0%, #101522 72%); border: 1px solid #173d79; border-radius: 0.85rem; }
+    .input-field { background-color: #080e1b; border: 1px solid #18345f; border-radius: 0.5rem; padding: 0.6rem 0.85rem; width: 100%; outline: none; }
+    .input-field:focus { border-color: #1677ff; }
+    .btn-primary { background: linear-gradient(135deg, #0758d9, #123d9d); color: #fff; transition: all 0.2s; }
+    .btn-primary:hover { background: linear-gradient(135deg, #1677ff, #0758d9); }
+    .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 1rem; border-radius: 0.5rem; color: #9ca3af; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: 0.15s; }
+    .nav-link:hover, .nav-link.active { background: linear-gradient(90deg, rgba(10,91,220,.30), rgba(8,20,45,.55)); color: #7db6ff; border: 1px solid rgba(35,111,255,.22); }
+    #sidebar { background: linear-gradient(180deg, #071b43 0%, #08132a 65%, #0a101c 100%) !important; border-color: #17366b !important; }
+    .top-login { display:inline-flex; align-items:center; gap:.45rem; padding:.55rem .8rem; border-radius:.65rem; background:linear-gradient(135deg,#0758d9,#123d9d); border:1px solid #2477ff; color:white; font-size:.75rem; font-weight:700; white-space:nowrap; }
+    @media (max-width: 767px) { #sidebar { position:fixed !important; top:0; bottom:0; left:0; width:16rem; transform:translateX(-100%); z-index:40; } #sidebar.mobile-open { transform:translateX(0); } #sidebarOverlay { z-index:30; } #sidebarOverlay:not(.hidden) { display:block; } .dashboard-header { padding-left:.75rem !important; padding-right:.75rem !important; } main { padding:.85rem !important; } #pageTitle { font-size:.8rem; } .top-login { padding:.5rem .6rem; } }
+
+    .robo-toast { animation: roboToastIn .28s cubic-bezier(.2,.8,.2,1) both; }
+    .robo-toast-out { animation: roboToastOut .22s ease-in forwards; }
+    .robo-toast-bar { animation: roboToastTimer 4.2s linear forwards; transform-origin:left; }
+    @keyframes roboToastIn { from { opacity:0; transform:translateY(18px) scale(.98) } to { opacity:1; transform:translateY(0) scale(1) } }
+    @keyframes roboToastOut { to { opacity:0; transform:translateY(12px) scale(.98) } }
+    @keyframes roboToastTimer { from { transform:scaleX(1) } to { transform:scaleX(0) } }
+  </style>
+
+  <style id="robo-premium-redesign">
+    :root{color-scheme:dark} body{background:#03050a!important;color:#eaf2ff!important;font-family:Inter,'Plus Jakarta Sans',sans-serif!important;background-image:radial-gradient(ellipse at 15% 0%,rgba(0,139,255,.15),transparent 34%),radial-gradient(ellipse at 100% 70%,rgba(73,70,255,.08),transparent 35%)!important}
+    #sidebar{background:linear-gradient(180deg,#050b18,#070a12 70%)!important;border-right:1px solid #122848!important;box-shadow:12px 0 45px #0005;transition:transform .25s,background .25s!important}
+    .card{background:linear-gradient(145deg,rgba(11,27,52,.96),rgba(8,12,23,.98))!important;border:1px solid #173965!important;border-radius:18px!important;box-shadow:0 12px 35px #0003;transition:transform .18s,border-color .18s}
+    .card:hover{border-color:#2366aa!important}
+    .nav-link{border:1px solid transparent!important;border-radius:11px!important;padding:.72rem .9rem!important;color:#9aabc3!important}.nav-link.active,.nav-link:hover{background:linear-gradient(100deg,#0b3b76a8,#101d34)!important;color:#8fc8ff!important;border-color:#1a5a9a!important;box-shadow:inset 3px 0 #31a5ff}
+    .dashboard-header{background:rgba(4,12,25,.9)!important;border-color:#15345c!important;backdrop-filter:blur(16px)}
+    .btn-primary{background:linear-gradient(120deg,#1688ff,#5148f5)!important;border:1px solid #429cff!important;border-radius:10px!important;box-shadow:0 5px 20px #1268dc25}.btn-primary:hover{filter:brightness(1.13);transform:translateY(-1px)}
+    .input-field,select,input,textarea{background:#050b16!important;border-color:#1b3557!important;border-radius:10px!important;color:#eaf2ff!important}.input-field:focus{border-color:#299cff!important;box-shadow:0 0 0 3px #1688ff20}
+    table thead{background:#071326} table tbody tr:hover{background:#0c1b30}
+    #pageTitle{font-size:1rem!important;letter-spacing:.02em}.dashboard-header{min-height:64px!important}
+    .view-panel:not(.hidden){animation:roboFade .22s ease both}@keyframes roboFade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+    #serverModal>div{background:#071225!important;border-color:#1b4779!important;border-radius:20px!important}
+    @media(max-width:767px){main{padding:1rem!important}.card{border-radius:15px!important}.dashboard-header{padding-left:.65rem!important;padding-right:.65rem!important}#pageTitle{font-size:.85rem!important}}
+  </style>
+
+</head>
+<body class="flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="w-64 bg-[#11151e] border-r border-[#202634] flex flex-col z-20 md:static fixed inset-y-0 -left-64 md:left-0 transition-all duration-200">
+    <div class="p-5 flex items-center justify-between border-b border-[#202634]">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-lg font-black shadow-lg shadow-indigo-600/30">🤖</div>
+        <div>
+          <h1 class="font-bold text-sm tracking-wide text-white">Robo Ayu</h1>
+          <span class="text-[11px] text-green-400 font-semibold flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Online
+          </span>
+        </div>
+      </div>
+      <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400"><i data-lucide="x"></i></button>
+    </div>
+
+    <!-- Server Selector -->
+    <div class="px-4 py-3 border-b border-[#202634]">
+      <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Active Server</label>
+      <button onclick="openServerModal()" id="currentGuildBtn" class="w-full flex items-center justify-between bg-[#171c28] hover:bg-[#1e2433] border border-[#262e40] px-3 py-2 rounded-lg text-left">
+        <span id="currentGuildName" class="text-xs font-semibold truncate">Select Server</span>
+        <i data-lucide="chevrons-up-down" class="w-4 h-4 text-gray-400"></i>
+      </button>
+    </div>
+
+    <!-- Navigation (Raw API & Gateway pages removed from UI) -->
+    <nav class="flex-1 overflow-y-auto p-3 space-y-1">
+      <div class="text-[10px] font-bold text-gray-500 uppercase px-3 pt-2 pb-1">Core Modules</div>
+      <a class="nav-link active" onclick="switchTab('overview', this)"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Overview</a>
+      <a class="nav-link" onclick="switchTab('autoreactions', this)"><i data-lucide="smile-plus" class="w-4 h-4"></i> Auto-Reaction</a>
+      <a class="nav-link" onclick="switchTab('messagebuilder', this)"><i data-lucide="messages-square" class="w-4 h-4"></i> Message Builder</a>
+      <a class="nav-link" onclick="switchTab('embedbuilder', this)"><i data-lucide="palette" class="w-4 h-4"></i> Embed Builder</a>
+      <a class="nav-link" onclick="switchTab('tickets', this)"><i data-lucide="ticket" class="w-4 h-4"></i> Ticket System</a>
+
+      <div class="text-[10px] font-bold text-gray-500 uppercase px-3 pt-4 pb-1">Moderation & Tools</div>
+      <a class="nav-link" onclick="switchTab('welcome', this)"><i data-lucide="door-open" class="w-4 h-4"></i> Welcome & Leave</a>
+      <a class="nav-link" onclick="switchTab('moderation', this)"><i data-lucide="shield" class="w-4 h-4"></i> Moderation</a>
+      <a class="nav-link" onclick="switchTab('automod', this)"><i data-lucide="zap" class="w-4 h-4"></i> AutoMod</a>
+      <a class="nav-link" onclick="switchTab('logs', this)"><i data-lucide="scroll-text" class="w-4 h-4"></i> Server Logs</a>
+
+      <div class="text-[10px] font-bold text-gray-500 uppercase px-3 pt-4 pb-1">Community</div>
+      <a class="nav-link" onclick="switchTab('leaderboards', this)"><i data-lucide="trophy" class="w-4 h-4"></i> Leaderboards</a>
+      <a class="nav-link" onclick="switchTab('giveaways', this)"><i data-lucide="gift" class="w-4 h-4"></i> Giveaways</a>
+      <a class="nav-link" onclick="switchTab('appearance', this)"><i data-lucide="palette" class="w-4 h-4"></i> Embed Appearance</a>
+      <a class="nav-link" onclick="switchTab('settings', this)"><i data-lucide="settings" class="w-4 h-4"></i> Bot Settings</a>
+    </nav>
+
+    <!-- User Profile Footer -->
+    <div class="p-3 border-t border-[#202634] bg-[#0d1017]">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2 truncate">
+          <img id="userAvatar" src="https://cdn.discordapp.com/embed/avatars/0.png" class="w-7 h-7 rounded-full" />
+          <p id="userName" class="text-xs font-bold truncate">Guest</p>
+        </div>
+        <a id="authBtn" href="/auth/login" class="text-xs font-semibold px-2 py-1 rounded bg-indigo-600 text-white">Login</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div id="sidebarOverlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-10 hidden md:hidden"></div>
+
+  <!-- Main Viewport -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <header class="dashboard-header h-14 bg-[#071329]/95 border-b border-[#17366b] flex items-center justify-between px-6 shrink-0">
+      <div class="flex items-center space-x-3">
+        <button onclick="toggleMobileSidebar()" aria-label="Open navigation menu" class="text-blue-300 hover:text-white p-2 rounded-lg hover:bg-blue-900/40"><i data-lucide="menu" class="w-6 h-6"></i></button>
+        <h2 id="pageTitle" class="text-sm font-bold text-white tracking-wide">Overview</h2>
+      </div>
+      <div class="flex items-center gap-2"><a id="topAuthBtn" href="/auth/login" class="top-login"><i data-lucide="discord" class="w-4 h-4"></i><span>Login with Discord</span></a><span class="hidden sm:inline text-xs text-blue-300 bg-blue-950/60 border border-blue-800/50 px-3 py-1 rounded-full">Robo Ayu Engine</span></div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6 space-y-6">
+      
+      <!-- 1. OVERVIEW -->
+      <section id="view-overview" class="view-panel space-y-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="card p-4">
+            <span class="text-[10px] font-bold text-gray-400 uppercase">Bot Status</span>
+            <div class="text-xl font-black text-green-400 mt-1">ONLINE</div>
+            <p class="text-[11px] text-gray-500">Live Discord REST</p>
+          </div>
+          <div class="card p-4">
+            <span class="text-[10px] font-bold text-gray-400 uppercase">REST Ping</span>
+            <div id="statPing" class="text-xl font-black text-indigo-400 mt-1">-- ms</div>
+            <p class="text-[11px] text-gray-500">Gateway Roundtrip</p>
+          </div>
+          <div class="card p-4">
+            <span class="text-[10px] font-bold text-gray-400 uppercase">Manageable Guilds</span>
+            <div id="statGuilds" class="text-xl font-black text-blue-400 mt-1">0</div>
+            <p class="text-[11px] text-gray-500">User Permissions Verified</p>
+          </div>
+          <div class="card p-4">
+            <span class="text-[10px] font-bold text-gray-400 uppercase">Security</span>
+            <div class="text-xl font-black text-purple-400 mt-1">SECURE</div>
+            <p class="text-[11px] text-gray-500">HTTP-Only Sessions</p>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <h3 class="text-sm font-bold text-white mb-2">Connected Guild Overview</h3>
+          <div id="guildStatusAlert" class="text-xs text-gray-400 p-3 rounded-lg bg-[#0d1117] border border-[#202634]">
+            Select a server from the sidebar to configure live settings and features.
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. AUTO-REACTION -->
+      <section id="view-autoreactions" class="view-panel hidden space-y-5">
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-white">Auto-Reaction Rules</h3>
+              <p class="text-xs text-gray-400">Configure emojis Robo Ayu will react with upon receiving messages.</p>
+            </div>
+            <button onclick="openNewReactionModal()" class="btn-primary text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 font-semibold">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Rule
+            </button>
+          </div>
+          <table class="w-full text-left text-xs">
+            <thead class="border-b border-[#202634] text-gray-400 uppercase text-[10px]">
+              <tr><th class="py-2.5 px-3">Channel</th><th class="py-2.5 px-3">Mode</th><th class="py-2.5 px-3">Emojis</th><th class="py-2.5 px-3 text-right">Action</th></tr>
+            </thead>
+            <tbody id="autoReactionList" class="divide-y divide-[#202634]"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3. TICKET SYSTEM -->
+      <section id="view-tickets" class="view-panel hidden space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="card p-5 space-y-3">
+            <h3 class="text-sm font-bold text-white">Post Ticket Panel</h3>
+            <p class="text-xs text-gray-400">Posts one Discord dropdown menu only: Help & Support, Report, or Donate / Claim. No buttons are added.</p>
+            <div>
+              <label class="text-[11px] text-gray-300 block mb-1">Target Channel</label>
+              <select id="ticketPostChannel" class="input-field text-xs"></select>
+            </div>
+            <div>
+              <label class="text-[11px] text-gray-300 block mb-1">Panel Title</label>
+              <input type="text" id="ticketPanelTitle" value="Robo Ayu Official Support" class="input-field text-xs">
+            </div>
+            <div>
+              <label class="text-[11px] text-gray-300 block mb-1">Description</label>
+              <textarea id="ticketPanelDesc" class="input-field text-xs h-16">Choose a category from the dropdown below to open a private ticket.</textarea>
+            </div>
+            <button onclick="sendTicketPanel()" class="btn-primary w-full py-2 rounded-md text-xs font-semibold">Send Panel</button>
+          </div>
+
+          <div class="card p-5 lg:col-span-2 space-y-3">
+            <h3 class="text-sm font-bold text-white">Ticket Logs</h3>
+            <table class="w-full text-left text-xs">
+              <thead class="border-b border-[#202634] text-gray-400 uppercase text-[10px]">
+                <tr><th class="py-2 px-3">ID</th><th class="py-2 px-3">Type</th><th class="py-2 px-3">Status</th><th class="py-2 px-3 text-right">Action</th></tr>
+              </thead>
+              <tbody id="ticketListBody" class="divide-y divide-[#202634]"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- MESSAGE BUILDER -->
+      <section id="view-messagebuilder" class="view-panel hidden space-y-5">
+        <div class="card p-5 space-y-3"><h3 class="text-sm font-bold">Message Builder</h3>
+          <div><label class="text-xs block mb-1">Channel</label><select id="mbChannel" class="input-field text-xs"></select></div>
+          <div><label class="text-xs block mb-1">Message content</label><textarea id="mbContent" maxlength="2000" class="input-field text-xs h-20" placeholder="Normal Discord message (optional if using embed)"></textarea></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3"><div><label class="text-xs block mb-1">Embed title</label><input id="mbTitle" class="input-field text-xs" maxlength="256"></div><div><label class="text-xs block mb-1">Embed colour</label><input id="mbColor" type="color" value="#164EAD" class="input-field h-10"></div></div>
+          <div><label class="text-xs block mb-1">Embed description</label><textarea id="mbDescription" class="input-field text-xs h-20"></textarea></div>
+          <div class="border-t border-blue-900 pt-3"><h4 class="text-xs font-bold mb-2">Link buttons (up to 5)</h4><div id="mbButtons" class="space-y-2"><div class="grid grid-cols-2 gap-2"><input class="input-field text-xs mb-label" placeholder="Button label"><input class="input-field text-xs mb-url" placeholder="https://example.com"></div></div><button onclick="addBuilderButton()" class="btn-primary px-3 py-2 rounded text-xs">+ Add link button</button></div>
+          <div class="border-t border-blue-900 pt-3"><h4 class="text-xs font-bold mb-2">Dropdown options (optional)</h4><input id="mbDropdownPlaceholder" class="input-field text-xs mb-2" placeholder="Dropdown placeholder"><div id="mbOptions" class="space-y-2"><div class="grid grid-cols-3 gap-2"><input class="input-field text-xs mo-label" placeholder="Label"><input class="input-field text-xs mo-value" placeholder="Value"><input class="input-field text-xs mo-desc" placeholder="Description"></div></div><button onclick="addBuilderOption()" class="btn-primary px-3 py-2 rounded text-xs">+ Add dropdown option</button></div>
+          <p class="text-xs text-gray-400">Messages sent to a channel are persistent. Ephemeral replies only work as responses to an interaction/button or dropdown click, not as ordinary channel messages.</p>
+          <button onclick="sendBuilderMessage()" class="btn-primary px-5 py-2 rounded text-xs font-bold">Send Message</button>
+        </div>
+      </section>
+      <!-- EMBED BUILDER -->
+      <section id="view-embedbuilder" class="view-panel hidden space-y-5">
+        <div class="card p-5 space-y-3"><h3 class="text-sm font-bold">Embed Builder</h3><p class="text-xs text-gray-400">Build a custom embed and preview it before sending.</p>
+          <div><label class="text-xs block mb-1">Channel</label><select id="ebChannel" class="input-field text-xs"></select></div>
+          <input id="ebTitle" class="input-field text-xs" maxlength="256" placeholder="Embed title (emoji or <:name:emoji_ID>)">
+          <p class="text-[11px] text-gray-500">Emoji tip: Discord does not convert shortcuts like :server: automatically. Use a normal emoji or the full custom emoji format &lt;:name:ID&gt; / &lt;a:name:ID&gt;.</p>
+          <textarea id="ebDescription" class="input-field text-xs h-24" placeholder="Embed description"></textarea>
+          <div class="grid grid-cols-2 gap-3"><input id="ebColor" type="color" value="#164EAD" class="input-field h-10"><input id="ebFooter" class="input-field text-xs" maxlength="2048" placeholder="Footer text"></div>
+          <div class="card p-4" id="ebPreview"><div id="ebPreviewTitle" class="font-bold text-sm">Embed preview</div><div id="ebPreviewDesc" class="text-xs text-gray-300 mt-2">Your description appears here.</div><div id="ebPreviewFooter" class="text-xs text-gray-500 mt-3"></div></div>
+          <button onclick="sendEmbedBuilder()" class="btn-primary px-5 py-2 rounded text-xs font-bold">Send Embed</button>
+        </div>
+      </section>
+
+      <!-- 4. WELCOME & LEAVE -->
+      <section id="view-welcome" class="view-panel hidden space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="card p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white">Welcome Messages</h3>
+              <input type="checkbox" id="welcomeEnabled" class="accent-indigo-600">
+            </div>
+            <div>
+              <label class="text-[11px] text-gray-300 block mb-1">Welcome Channel</label>
+              <select id="welcomeChannel" class="input-field text-xs"></select>
+            </div>
+            <div>
+              <label class="text-[11px] text-gray-300 block mb-1">Message ({user}, {server})</label>
+              <textarea id="welcomeMsg" class="input-field text-xs h-20">Welcome {user} to {server}!</textarea>
+            </div>
+          </div>
+          <div class="card p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white">Leave Messages</h3>
+              <input type="checkbox" id="leaveEnabled" class="accent-indigo-600">
+            </div>
+            <div>
+              <label class="text-[11px] text-gray-300 block mb-1">Leave Channel</label>
+              <select id="leaveChannel" class="input-field text-xs"></select>
+            </div>
+            <div>
+              <label class="text-[11px] text-gray-300 block mb-1">Message</label>
+              <textarea id="leaveMsg" class="input-field text-xs h-20">{user} left the server.</textarea>
+            </div>
+          </div>
+        </div>
+        <button onclick="saveWelcomeSettings()" class="btn-primary px-5 py-2 rounded-md text-xs font-semibold">Save Settings</button>
+      </section>
+
+      <!-- 5. MODERATION -->
+      <section id="view-moderation" class="view-panel hidden space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="card p-5 space-y-3">
+            <h3 class="text-sm font-bold text-white">Direct Moderation Action</h3>
+            <div>
+              <label class="text-[11px] text-gray-300 block mb-1">Target User ID</label>
+              <input type="text" id="modTargetId" placeholder="123456789012345678" class="input-field text-xs">
+            </div>
+            <div>
+              <label class="text-[11px] text-gray-300 block mb-1">Reason</label>
+              <input type="text" id="modReason" placeholder="Rule violation" class="input-field text-xs">
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button onclick="execMod('warn')" class="bg-yellow-600 hover:bg-yellow-500 py-1.5 rounded text-xs font-bold">WARN</button>
+              <button onclick="execMod('timeout')" class="bg-orange-600 hover:bg-orange-500 py-1.5 rounded text-xs font-bold">TIMEOUT</button>
+              <button onclick="execMod('kick')" class="bg-red-700 hover:bg-red-600 py-1.5 rounded text-xs font-bold">KICK</button>
+              <button onclick="execMod('ban')" class="bg-red-900 hover:bg-red-800 py-1.5 rounded text-xs font-bold">BAN</button>
+            </div>
+            <hr class="border-[#202634] my-2">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase">Purge Messages</h4>
+            <div class="flex gap-2">
+              <select id="modClearChannel" class="input-field text-xs flex-1"></select>
+              <input type="number" id="modClearAmount" value="25" min="1" max="100" class="input-field text-xs w-16">
+              <button onclick="execClear()" class="btn-primary px-3 text-xs font-bold rounded">Purge</button>
+            </div>
+          </div>
+
+          <div class="card p-5 lg:col-span-2 space-y-3">
+            <h3 class="text-sm font-bold text-white">Audit Cases</h3>
+            <table class="w-full text-left text-xs">
+              <thead class="border-b border-[#202634] text-gray-400 uppercase text-[10px]">
+                <tr><th class="py-2 px-3">#</th><th class="py-2 px-3">Action</th><th class="py-2 px-3">Target</th><th class="py-2 px-3">Reason</th></tr>
+              </thead>
+              <tbody id="modCasesBody" class="divide-y divide-[#202634]"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. AUTOMOD -->
+      <section id="view-automod" class="view-panel hidden space-y-4">
+        <div class="card p-5 max-w-2xl space-y-4">
+          <h3 class="text-sm font-bold text-white">AutoMod & Safeguards</h3>
+          <div class="flex items-center justify-between p-3 bg-[#0d1117] rounded border border-[#202634]">
+            <span class="text-xs font-medium">Block Invite Links (discord.gg)</span>
+            <input type="checkbox" id="automodAntiInvite" class="accent-indigo-600">
+          </div>
+          <div class="flex items-center justify-between p-3 bg-[#0d1117] rounded border border-[#202634]">
+            <span class="text-xs font-medium">Anti-Spam Mention Limit</span>
+            <input type="number" id="automodMaxMentions" value="5" class="input-field text-xs w-16 text-center">
+          </div>
+          <div>
+            <label class="text-[11px] text-gray-300 block mb-1">Banned Words (comma separated)</label>
+            <textarea id="automodWords" class="input-field text-xs h-20" placeholder="scam, badword1, invite"></textarea>
+          </div>
+          <button onclick="saveAutoMod()" class="btn-primary px-5 py-2 rounded text-xs font-semibold">Save Filters</button>
+        </div>
+      </section>
+
+      <!-- 7. SERVER LOGS -->
+      <section id="view-logs" class="view-panel hidden space-y-4">
+        <div class="card p-5 max-w-md space-y-3">
+          <h3 class="text-sm font-bold text-white">Audit Log Channel</h3>
+          <div>
+            <label class="text-[11px] text-gray-300 block mb-1">Log Channel</label>
+            <select id="serverLogChannel" class="input-field text-xs"></select>
+          </div>
+          <button onclick="saveServerLogChannel()" class="btn-primary px-5 py-2 rounded text-xs font-semibold">Save Log Channel</button>
+        </div>
+      </section>
+
+      <!-- 8. LEADERBOARDS -->
+      <section id="view-leaderboards" class="view-panel hidden space-y-4">
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white">Community Activity Rankings</h3>
+            <div class="flex bg-[#0d1117] border border-[#202634] rounded p-1">
+              <button onclick="filterLb('all')" class="lb-tab active px-2.5 py-1 text-xs rounded text-indigo-400 bg-[#171c28]">All-Time</button>
+              <button onclick="filterLb('weekly')" class="lb-tab px-2.5 py-1 text-xs rounded text-gray-400">Weekly</button>
+              <button onclick="filterLb('daily')" class="lb-tab px-2.5 py-1 text-xs rounded text-gray-400">Daily</button>
+            </div>
+          </div>
+          <table class="w-full text-left text-xs">
+            <thead class="border-b border-[#202634] text-gray-400 uppercase text-[10px]">
+              <tr><th class="py-2 px-3">Rank</th><th class="py-2 px-3">User</th><th class="py-2 px-3">Level</th><th class="py-2 px-3">XP</th></tr>
+            </thead>
+            <tbody id="leaderboardBody" class="divide-y divide-[#202634]"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- GIVEAWAYS -->
+      <section id="view-giveaways" class="view-panel hidden space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="card p-5 space-y-3">
+            <h3 class="text-sm font-bold text-white">Create Giveaway</h3>
+            <div><label class="text-[11px] text-gray-300 block mb-1">Target Channel</label><select id="gwChannel" class="input-field text-xs"></select></div>
+            <div><label class="text-[11px] text-gray-300 block mb-1">Prize</label><input type="text" id="gwPrize" placeholder="Control Fruit" class="input-field text-xs" maxlength="200"></div>
+            <div><label class="text-[11px] text-gray-300 block mb-1">Description / Message (optional)</label><textarea id="gwDescription" placeholder="Join the giveaway!" class="input-field text-xs h-16"></textarea></div>
+            <div class="grid grid-cols-2 gap-2"><div><label class="text-[11px] text-gray-300 block mb-1">Duration (minutes)</label><input type="number" id="gwDuration" value="60" min="1" max="100800" class="input-field text-xs"></div><div><label class="text-[11px] text-gray-300 block mb-1">Winners</label><input type="number" id="gwWinners" value="1" min="1" max="100" class="input-field text-xs"></div></div>
+            <div><label class="text-[11px] text-gray-300 block mb-1">Message requirement (tracked after dashboard bot starts)</label><input type="number" id="gwMessageRequired" value="0" min="0" class="input-field text-xs"><p class="text-[10px] text-gray-500 mt-1">0 = no requirement. Existing historical messages cannot be counted automatically.</p></div>
+            <div><label class="text-[11px] text-gray-300 block mb-1">Blacklist Role (optional)</label><select id="gwBlacklistRole" class="input-field text-xs"><option value="">No blacklist role</option></select></div>
+            <div><label class="text-[11px] text-gray-300 block mb-1">Giveaway Image (optional)</label><input id="gwImage" type="file" accept="image/png,image/jpeg,image/gif,image/webp" class="input-field text-xs"><img id="gwImagePreview" class="hidden rounded-lg max-h-32 object-contain" alt="Giveaway image preview"></div>
+            <div><label class="text-[11px] text-gray-300 block mb-1">Embed colour</label><div class="flex gap-2"><input type="color" id="gwColor" value="#FEE75C" class="w-12 h-10 bg-transparent cursor-pointer"><input type="text" id="gwColorHex" value="#FEE75C" maxlength="7" class="input-field text-xs" placeholder="#FEE75C"></div></div>
+            <button onclick="createGiveaway()" class="btn-primary w-full py-2 rounded text-xs font-semibold">Launch Giveaway</button>
+            <p class="text-[10px] text-gray-500">Discord message will have Participate and View Participants buttons.</p>
+          </div>
+          <div class="card p-5 lg:col-span-2 space-y-3 overflow-x-auto"><h3 class="text-sm font-bold text-white">Giveaways</h3><table class="w-full text-left text-xs"><thead class="border-b border-[#202634] text-gray-400 uppercase text-[10px]"><tr><th class="py-2 px-3">Prize</th><th class="py-2 px-3">Entries</th><th class="py-2 px-3">Status</th><th class="py-2 px-3 text-right">Actions</th></tr></thead><tbody id="giveawayBody" class="divide-y divide-[#202936]"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- EMBED APPEARANCE -->
+      <section id="view-appearance" class="view-panel hidden space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="card p-5 space-y-4"><h3 class="text-sm font-bold text-white">Embed Colour Studio</h3><p class="text-xs text-gray-400">Every embed category has its own saved HEX colour. These settings apply when the dashboard creates those embeds.</p>
+            <div><label class="text-[11px] text-gray-300 block mb-1">Embed type</label><select id="embedType" class="input-field text-xs"><option value="giveaway">Giveaways</option><option value="tickets">Ticket panels</option><option value="ticketLogs">Ticket logs</option><option value="welcome">Welcome messages</option><option value="leave">Leave messages</option><option value="moderation">Moderation logs</option><option value="automod">AutoMod notices</option><option value="leaderboards">Leaderboards</option><option value="success">Success messages</option><option value="error">Error messages</option><option value="warning">Warning messages</option><option value="info">Information embeds</option><option value="other">Other embeds</option></select></div>
+            <div><label class="text-[11px] text-gray-300 block mb-1">Choose colour</label><div class="flex gap-3 items-center"><input type="color" id="embedColorPicker" value="#5865F2" class="w-16 h-12 bg-transparent cursor-pointer"><input id="embedColorHex" value="#5865F2" maxlength="7" class="input-field text-sm" placeholder="#5865F2"></div></div>
+            <div class="flex flex-wrap gap-2"><button onclick="setEmbedPreset('#5865F2')" class="px-3 py-1.5 rounded bg-indigo-600 text-xs">Discord Blue</button><button onclick="setEmbedPreset('#FF0000')" class="px-3 py-1.5 rounded bg-red-700 text-xs">Red</button><button onclick="setEmbedPreset('#00FF99')" class="px-3 py-1.5 rounded bg-emerald-700 text-xs">Neon Green</button><button onclick="setEmbedPreset('#000000')" class="px-3 py-1.5 rounded bg-black border border-gray-600 text-xs">Black</button><button onclick="setEmbedPreset('#FFFFFF')" class="px-3 py-1.5 rounded bg-white text-black text-xs">White</button></div>
+            <div class="flex gap-2"><button onclick="saveEmbedColor()" class="btn-primary px-4 py-2 rounded text-xs font-semibold">Save Colour</button><button onclick="resetEmbedColor()" class="px-4 py-2 rounded text-xs font-semibold bg-gray-700 hover:bg-gray-600">Reset to Default</button></div><p id="embedColorStatus" class="text-xs text-gray-400"></p>
+          </div>
+          <div class="card p-5"><h3 class="text-sm font-bold text-white mb-4">Live Preview</h3><div class="rounded-lg bg-[#20232b] p-4"><div id="embedPreview" class="rounded-md bg-[#2b2d31] p-4 border-l-4" style="border-color:#5865F2"><div id="embedPreviewTitle" class="font-bold text-sm">ROBO AYU • Giveaway</div><p class="text-xs text-gray-300 mt-2">Your selected embed colour will appear on Discord embeds created by supported dashboard features.</p><div class="text-[10px] text-gray-500 mt-4">ROBO AYU Dashboard Preview</div></div></div><p class="text-[10px] text-gray-500 mt-3">Existing Discord messages are not edited automatically; colour changes apply to newly created embeds unless a feature is explicitly updated.</p></div>
+        </div>
+      </section>
+
+      <!-- 10. BOT SETTINGS -->
+      <section id="view-settings" class="view-panel hidden space-y-4">
+        <div class="card p-5 max-w-md space-y-3">
+          <h3 class="text-lg font-extrabold text-white">⚙️ Bot Settings</h3><p class="text-xs text-slate-400">Set your server prefix. Prefix commands are handled by the connected ROBO AYU gateway bot.</p>
+          <div>
+            <label class="text-[11px] text-gray-300 block mb-1">Command Prefix</label>
+            <input type="text" id="settingsPrefix" value="!" maxlength="5" placeholder="!" class="input-field text-sm"><p class="text-[11px] text-gray-500">Example: !ping, !help. Use 1–5 characters.</p>
+          </div>
+          <div>
+            <label class="text-[11px] text-gray-300 block mb-1">Accent Color</label>
+            <input type="color" id="settingsAccent" value="#5865F2" class="w-full h-8 bg-transparent cursor-pointer rounded">
+          </div>
+          <button onclick="saveGeneralSettings()" class="btn-primary px-5 py-2 rounded text-xs font-semibold">Save Preferences</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Server Modal -->
+  <div id="serverModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#151921] border border-[#232936] rounded-xl w-full max-w-sm p-5 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-sm text-white">Select Server</h3>
+        <button onclick="closeServerModal()" class="text-gray-400"><i data-lucide="x"></i></button>
+      </div>
+      <div id="serverModalList" class="space-y-1.5 max-h-72 overflow-y-auto pr-1"></div>
+    </div>
+  </div>
+
+  <!-- Add Reaction Modal -->
+  <div id="reactionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#151921] border border-[#232936] rounded-xl w-full max-w-sm p-5 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-sm text-white">New Reaction Rule</h3>
+        <button onclick="closeReactionModal()" class="text-gray-400"><i data-lucide="x"></i></button>
+      </div>
+      <div>
+        <label class="text-[11px] text-gray-300 block mb-1">Channel</label>
+        <select id="modalReactionChannel" class="input-field text-xs"></select>
+      </div>
+      <div>
+        <p class="text-[11px] text-gray-400">No trigger required — these emojis will be added to every new message in the selected channel.</p>
+      </div>
+      <div>
+        <label class="text-[11px] text-gray-300 block mb-1">Emojis (comma separated)</label>
+        <input type="text" id="modalReactionEmojis" placeholder="🔥, ⭐, <:pepe:123>" class="input-field text-xs">
+      </div>
+      <button onclick="submitReactionRule()" class="btn-primary w-full py-2 rounded text-xs font-semibold">Add Rule</button>
+    </div>
+  </div>
+
+  <!-- Frontend JavaScript Application -->
+  <script>
+    let appState = { user: null, activeGuild: null, channels: [], roles: [], lbData: [], embedColors: {} };
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      await initAuth();
+      await fetchBotStatus();
+    });
+
+    async function initAuth() {
+      try {
+        const res = await fetch('/auth/me');
+        const data = await res.json();
+        if (data.authenticated) {
+          appState.user = data.user;
+          document.getElementById('userName').innerText = data.user.username;
+          if (data.user.avatar) {
+            document.getElementById('userAvatar').src = `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}.png`;
+          }
+          const authBtn = document.getElementById('authBtn');
+          authBtn.innerText = 'Logout';
+          authBtn.href = '/auth/logout';
+          authBtn.className = 'text-xs font-semibold px-2 py-1 rounded bg-red-600/80 text-white';
+          const topAuthBtn = document.getElementById('topAuthBtn');
+          topAuthBtn.innerHTML = '<i data-lucide="log-out" class="w-4 h-4"></i><span>Logout</span>';
+          topAuthBtn.href = '/auth/logout';
+          lucide.createIcons();
+          document.getElementById('statGuilds').innerText = data.user.guilds.length;
+
+          if (data.user.guilds.length > 0) selectGuild(data.user.guilds[0]);
+        }
+      } catch (err) {}
+    }
+
+    async function fetchBotStatus() {
+      try {
+        const res = await fetch('/api/bot/status');
+        const data = await res.json();
+        if (data.online) document.getElementById('statPing').innerText = `${data.ping} ms`;
+      } catch (e) {
+        document.getElementById('statPing').innerText = 'Offline';
+      }
+    }
+
+    function openServerModal() {
+      if (!appState.user) return showToast('Please login first', 'error', 'NOTICE');
+      const list = document.getElementById('serverModalList');
+      list.innerHTML = '';
+      appState.user.guilds.forEach(g => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-2 rounded bg-[#0d1117] hover:bg-[#1a202c] cursor-pointer';
+        div.onclick = () => { selectGuild(g); closeServerModal(); };
+        div.innerHTML = `<span class="text-xs font-semibold text-white truncate">${g.name}</span><span class="text-[10px] text-indigo-400">Select</span>`;
+        list.appendChild(div);
+      });
+      document.getElementById('serverModal').classList.remove('hidden');
+    }
+
+    function closeServerModal() { document.getElementById('serverModal').classList.add('hidden'); }
+
+    async function selectGuild(guild) {
+      appState.activeGuild = guild;
+      document.getElementById('currentGuildName').innerText = guild.name;
+
+      const res = await fetch(`/api/guilds/${guild.id}/details`);
+      const details = await res.json();
+      const alertBox = document.getElementById('guildStatusAlert');
+
+      if (!details.botInGuild) {
+        alertBox.innerHTML = `Robo Ayu is not in this guild. <a href="${details.inviteUrl}" target="_blank" class="underline text-indigo-400 ml-1">Invite Bot</a>`;
+        return;
+      }
+      alertBox.innerHTML = `<span class="text-green-400 font-bold">Connected:</span> ${details.channels.length} live channels detected.`;
+      appState.channels = details.channels;
+      appState.roles = details.roles || [];
+      const roleSelect = document.getElementById('gwBlacklistRole');
+      roleSelect.innerHTML = '<option value="">No blacklist role</option>';
+      appState.roles.filter(r => !r.managed && r.name !== '@everyone').forEach(r => { const o=document.createElement('option'); o.value=r.id; o.textContent='@'+r.name; roleSelect.appendChild(o); });
+
+      ['ticketPostChannel', 'welcomeChannel', 'leaveChannel', 'modClearChannel', 'serverLogChannel', 'gwChannel', 'modalReactionChannel', 'mbChannel', 'ebChannel'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerHTML = '<option value="">-- Choose Channel --</option>';
+        appState.channels.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = `# ${c.name}`;
+          el.appendChild(opt);
+        });
+      });
+
+      loadGuildData();
+    }
+
+    async function loadGuildData() {
+      const gId = appState.activeGuild.id;
+      loadAutoReactions();
+      loadTickets();
+      loadModCases();
+      loadGiveaways();
+      loadEmbedColors();
+
+      const [sRes, aRes, lbRes] = await Promise.all([
+        fetch(`/api/guilds/${gId}/settings`),
+        fetch(`/api/guilds/${gId}/automod`),
+        fetch(`/api/guilds/${gId}/leaderboards`)
+      ]);
+      const settings = await sRes.json();
+      const automod = await aRes.json();
+      appState.lbData = await lbRes.json();
+
+      document.getElementById('welcomeEnabled').checked = settings.welcome?.enabled || false;
+      document.getElementById('welcomeChannel').value = settings.welcome?.channelId || '';
+      document.getElementById('welcomeMsg').value = settings.welcome?.message || '';
+      document.getElementById('leaveEnabled').checked = settings.leave?.enabled || false;
+      document.getElementById('leaveChannel').value = settings.leave?.channelId || '';
+      document.getElementById('leaveMsg').value = settings.leave?.message || '';
+      document.getElementById('serverLogChannel').value = settings.logsChannelId || '';
+      document.getElementById('settingsPrefix').value = settings.prefix || '!';
+
+      document.getElementById('automodAntiInvite').checked = automod.antiInvite;
+      document.getElementById('automodMaxMentions').value = automod.maxMentions || 5;
+      document.getElementById('automodWords').value = (automod.bannedWords || []).join(', ');
+
+      filterLb('all');
+    }
+
+    // Auto-Reactions
+    async function loadAutoReactions() {
+      const res = await fetch(`/api/guilds/${appState.activeGuild.id}/autoreactions`);
+      const rules = await res.json();
+      const tbody = document.getElementById('autoReactionList');
+      tbody.innerHTML = '';
+      rules.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-2 px-3 font-semibold text-white">#${appState.channels.find(c=>c.id===r.channelId)?.name || r.channelId}</td>
+          <td class="py-2 px-3"><span class="text-emerald-400">Every message</span></td>
+          <td class="py-2 px-3 text-base">${r.emojis.join(' ')}</td>
+          <td class="py-2 px-3 text-right"><button onclick="deleteReaction('${r.id}')" class="text-red-400 hover:underline">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openNewReactionModal() { document.getElementById('reactionModal').classList.remove('hidden'); }
+    function closeReactionModal() { document.getElementById('reactionModal').classList.add('hidden'); }
+
+    async function submitReactionRule() {
+      const channelId = document.getElementById('modalReactionChannel').value;
+      const triggerWord = '*';
+      const emojis = document.getElementById('modalReactionEmojis').value.split(',').map(e => e.trim()).filter(Boolean);
+      await fetch(`/api/guilds/${appState.activeGuild.id}/autoreactions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channelId, triggerWord, emojis })
+      });
+      closeReactionModal();
+      loadAutoReactions();
+    }
+
+    async function deleteReaction(id) {
+      await fetch(`/api/guilds/${appState.activeGuild.id}/autoreactions/${id}`, { method: 'DELETE' });
+      loadAutoReactions();
+    }
+
+    // Tickets
+    async function sendTicketPanel() {
+      const channelId = document.getElementById('ticketPostChannel').value;
+      const title = document.getElementById('ticketPanelTitle').value;
+      const description = document.getElementById('ticketPanelDesc').value;
+      const btn = document.querySelector('button[onclick="sendTicketPanel()"]');
+      if (!channelId) return showToast('Choose a target channel first.', 'error', 'Channel required');
+      if (btn) { btn.disabled = true; btn.dataset.originalText = btn.textContent; btn.textContent = 'Sending panel…'; }
+      try {
+        const res = await fetch(`/api/guilds/${appState.activeGuild.id}/tickets/send-panel`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channelId, title, description })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || `Request failed (${res.status})`);
+        showToast('Ticket dropdown posted to Discord.', 'success', 'PANEL SENT SUCCESSFULLY');
+      } catch (err) { showToast(err.message || 'Could not send the ticket panel.', 'error', 'PANEL NOT SENT'); }
+      finally { if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Send Panel'; } }
+    }
+
+    function showToast(message, kind = 'success', heading) {
+      let host = document.getElementById('roboToastHost');
+      if (!host) {
+        host = document.createElement('div'); host.id = 'roboToastHost';
+        host.className = 'fixed bottom-5 left-4 right-4 sm:left-auto sm:right-6 sm:w-[360px] z-[9999] flex flex-col gap-3 pointer-events-none';
+        document.body.appendChild(host);
+      }
+      const ok = kind === 'success';
+      const toast = document.createElement('div');
+      toast.className = `robo-toast pointer-events-auto overflow-hidden rounded-xl border ${ok ? 'border-emerald-400/30' : 'border-rose-400/30'} bg-[#0b1220]/95 shadow-2xl backdrop-blur-xl`;
+      const top = document.createElement('div'); top.className = 'flex items-start gap-3 p-4';
+      const icon = document.createElement('div'); icon.className = `text-xl ${ok ? 'text-emerald-400' : 'text-rose-400'}`; icon.textContent = ok ? '✓' : '×';
+      const copy = document.createElement('div'); copy.className = 'min-w-0 flex-1';
+      const title = document.createElement('div'); title.className = 'text-xs font-extrabold tracking-wider text-white'; title.textContent = heading || (ok ? 'SUCCESS' : 'ERROR');
+      const msg = document.createElement('div'); msg.className = 'mt-1 text-xs leading-relaxed text-slate-300'; msg.textContent = message;
+      copy.append(title, msg); const close = document.createElement('button'); close.className = 'text-slate-400 hover:text-white'; close.textContent = '×'; close.onclick = () => toast.remove();
+      top.append(icon, copy, close); const bar = document.createElement('div'); bar.className = `h-[3px] ${ok ? 'bg-emerald-400' : 'bg-rose-400'} robo-toast-bar`;
+      toast.append(top, bar); host.appendChild(toast);
+      setTimeout(() => { toast.classList.add('robo-toast-out'); setTimeout(() => toast.remove(), 250); }, 4200);
+    }
+
+    async function loadTickets() {
+      const res = await fetch(`/api/guilds/${appState.activeGuild.id}/tickets`);
+      const tickets = await res.json();
+      const tbody = document.getElementById('ticketListBody');
+      tbody.innerHTML = '';
+      tickets.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-2 px-3 font-mono font-bold text-indigo-400">${t.id}</td>
+          <td class="py-2 px-3">${t.type || 'Support'}</td>
+          <td class="py-2 px-3">${t.status}</td>
+          <td class="py-2 px-3 text-right">${t.status === 'OPEN' ? `<button onclick="closeTicket('${t.id}')" class="text-red-400">Close</button>` : 'Resolved'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function closeTicket(id) {
+      await fetch(`/api/guilds/${appState.activeGuild.id}/tickets/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'CLOSED' })
+      });
+      loadTickets();
+    }
+
+    // Moderation
+    async function execMod(action) {
+      const userId = document.getElementById('modTargetId').value.trim();
+      const reason = document.getElementById('modReason').value.trim();
+      const res = await fetch(`/api/guilds/${appState.activeGuild.id}/moderation/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, reason, minutes: 10 })
+      });
+      const data = await res.json();
+      showToast(data.success ? `Executed ${action.toUpperCase()}` : ('Error: ' + data.error), data.success ? 'success' : 'error', data.success ? 'ACTION COMPLETE' : 'ACTION FAILED');
+      loadModCases();
+    }
+
+    async function execClear() {
+      const channelId = document.getElementById('modClearChannel').value;
+      const amount = document.getElementById('modClearAmount').value;
+      const res = await fetch(`/api/guilds/${appState.activeGuild.id}/moderation/clear`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channelId, amount })
+      });
+      const data = await res.json();
+      showToast(data.success ? `Deleted ${data.deleted} messages` : ('Error: ' + data.error), data.success ? 'success' : 'error', data.success ? 'MESSAGES DELETED' : 'ACTION FAILED');
+    }
+
+    async function loadModCases() {
+      const res = await fetch(`/api/guilds/${appState.activeGuild.id}/moderation/cases`);
+      const cases = await res.json();
+      const tbody = document.getElementById('modCasesBody');
+      tbody.innerHTML = '';
+      cases.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="py-2 px-3">#${c.id}</td><td class="py-2 px-3 text-indigo-400 font-bold">${c.type}</td><td class="py-2 px-3 font-mono">${c.targetUserId}</td><td class="py-2 px-3 truncate max-w-[120px]">${c.reason}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // AutoMod, Giveaways, Settings
+    async function saveAutoMod() {
+      const antiInvite = document.getElementById('automodAntiInvite').checked;
+      const maxMentions = parseInt(document.getElementById('automodMaxMentions').value) || 5;
+      const bannedWords = document.getElementById('automodWords').value.split(',').map(w => w.trim()).filter(Boolean);
+      await fetch(`/api/guilds/${appState.activeGuild.id}/automod`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ antiInvite, maxMentions, bannedWords })
+      });
+      showToast('AutoMod updated!', 'success', 'SAVED SUCCESSFULLY');
+    }
+
+    function hexValid(v) { return /^#[0-9a-fA-F]{6}$/.test(v); }
+    function syncColorInputs(a,b,previewId) { const x=document.getElementById(a), y=document.getElementById(b); if(!x||!y)return; x.addEventListener('input',()=>{y.value=x.value.toUpperCase(); if(previewId) document.getElementById(previewId).style.borderColor=x.value;}); y.addEventListener('input',()=>{if(hexValid(y.value)){x.value=y.value; if(previewId)document.getElementById(previewId).style.borderColor=y.value;}}); }
+    syncColorInputs('gwColor','gwColorHex');
+    syncColorInputs('embedColorPicker','embedColorHex','embedPreview');
+    document.getElementById('gwImage')?.addEventListener('change', e=>{ const f=e.target.files[0], img=document.getElementById('gwImagePreview'); if(!f){img.classList.add('hidden');return;} if(f.size>7*1024*1024){showToast('Image must be 7 MB or smaller.', 'error', 'NOTICE');e.target.value='';return;} img.src=URL.createObjectURL(f);img.classList.remove('hidden'); });
+
+    async function createGiveaway() {
+      if (!appState.activeGuild) return showToast('Select a server first.', 'error', 'NOTICE');
+      const channelId=document.getElementById('gwChannel').value, prize=document.getElementById('gwPrize').value.trim();
+      const durationMinutes=Number(document.getElementById('gwDuration').value), winnersCount=Number(document.getElementById('gwWinners').value);
+      const color=document.getElementById('gwColorHex').value.trim();
+      if(!channelId || !prize) return showToast('Choose a channel and enter a prize.', 'error', 'NOTICE');
+      if(!Number.isInteger(durationMinutes)||durationMinutes<1||durationMinutes>100800) return showToast('Duration must be 1 to 100800 minutes.', 'error', 'NOTICE');
+      if(!Number.isInteger(winnersCount)||winnersCount<1||winnersCount>100) return showToast('Winners must be between 1 and 100.', 'error', 'NOTICE');
+      if(!hexValid(color)) return showToast('Enter a valid HEX colour like #5865F2.', 'error', 'NOTICE');
+      const file=document.getElementById('gwImage').files[0]; let imageData=null;
+      if(file){imageData=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});}
+      const res=await fetch(`/api/guilds/${appState.activeGuild.id}/giveaways`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelId,prize,description:document.getElementById('gwDescription').value,durationMinutes,winnersCount,messageRequired:Number(document.getElementById('gwMessageRequired').value)||0,blacklistRoleId:document.getElementById('gwBlacklistRole').value,color,imageData})});
+      const data=await res.json(); if(!res.ok||data.error) return showToast('Giveaway error: '+(data.error||'Could not create giveaway.'), 'error', 'GIVEAWAY FAILED');
+      showToast('Giveaway posted! Participants can use the Discord buttons.', 'success', 'GIVEAWAY POSTED'); document.getElementById('gwPrize').value='';document.getElementById('gwDescription').value='';document.getElementById('gwImage').value='';document.getElementById('gwImagePreview').classList.add('hidden');loadGiveaways();
+    }
+    async function loadGiveaways() {
+      if(!appState.activeGuild)return; const res=await fetch(`/api/guilds/${appState.activeGuild.id}/giveaways`); const gws=await res.json(); const tbody=document.getElementById('giveawayBody'); tbody.innerHTML='';
+      gws.forEach(g=>{const tr=document.createElement('tr');const status=g.ended?'ENDED':new Date(g.endsAt).getTime()<=Date.now()?'ENDING':'RUNNING';tr.innerHTML=`<td class="py-2 px-3 font-semibold text-white">${escapeHtml(g.prize)}</td><td class="py-2 px-3">${g.participants?.length||0}</td><td class="py-2 px-3">${status}</td><td class="py-2 px-3 text-right">${!g.ended?`<button onclick="endGiveaway('${g.id}')" class="text-yellow-400 hover:underline">End</button>`:`<button onclick="rerollGiveaway('${g.id}')" class="text-indigo-400 hover:underline">Reroll</button>`}</td>`;tbody.appendChild(tr);});
+    }
+    function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+    async function endGiveaway(id){if(!confirm('End this giveaway and select winners?'))return;const res=await fetch(`/api/guilds/${appState.activeGuild.id}/giveaways/${id}/end`,{method:'POST'});const d=await res.json();if(!res.ok)showToast(d.error||'Could not end giveaway', 'error', 'NOTICE');loadGiveaways();}
+    async function rerollGiveaway(id){const res=await fetch(`/api/guilds/${appState.activeGuild.id}/giveaways/${id}/reroll`,{method:'POST'});const d=await res.json();showToast(res.ok ? `New winner(s): ${(d.winners||[]).map(x=>'<@'+x+'>').join(', ')||'No eligible entries'}` : ('Error: '+d.error), res.ok ? 'success' : 'error', res.ok ? 'GIVEAWAY REROLLED' : 'REROLL FAILED');loadGiveaways();}
+
+    async function loadEmbedColors(){if(!appState.activeGuild)return;try{const r=await fetch(`/api/guilds/${appState.activeGuild.id}/embed-colors`);appState.embedColors=await r.json();syncEmbedColorUI();}catch(e){}}
+    function syncEmbedColorUI(){const type=document.getElementById('embedType').value;const c=appState.embedColors[type]||'#5865F2';document.getElementById('embedColorPicker').value=c;document.getElementById('embedColorHex').value=c;document.getElementById('embedPreview').style.borderColor=c;document.getElementById('embedPreviewTitle').textContent='ROBO AYU • '+type.replace(/([A-Z])/g,' $1');}
+    document.getElementById('embedType')?.addEventListener('change',syncEmbedColorUI);
+    function setEmbedPreset(c){document.getElementById('embedColorPicker').value=c;document.getElementById('embedColorHex').value=c;document.getElementById('embedPreview').style.borderColor=c;}
+    async function saveEmbedColor(){if(!appState.activeGuild)return showToast('Select a server first.', 'error', 'NOTICE');const type=document.getElementById('embedType').value,c=document.getElementById('embedColorHex').value.trim();if(!hexValid(c))return showToast('Use a valid HEX code, e.g. #FF0000', 'error', 'NOTICE');const r=await fetch(`/api/guilds/${appState.activeGuild.id}/embed-colors`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,color:c.toUpperCase()})});const d=await r.json();if(!r.ok)return showToast(d.error||'Save failed', 'error', 'NOTICE');appState.embedColors=d.colors;document.getElementById('embedColorStatus').textContent=`Saved ${c.toUpperCase()} for ${type}.`;syncEmbedColorUI();}
+    async function resetEmbedColor(){setEmbedPreset('#5865F2');document.getElementById('embedColorHex').value='#5865F2';await saveEmbedColor();}
+
+    function filterLb(type) {
+      document.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active', 'bg-[#171c28]', 'text-indigo-400'));
+      event.target.classList.add('active', 'bg-[#171c28]', 'text-indigo-400');
+      const tbody = document.getElementById('leaderboardBody');
+      tbody.innerHTML = '';
+      let list = [...appState.lbData];
+      if (type === 'weekly') list.sort((a,b) => b.weeklyXp - a.weeklyXp);
+      else if (type === 'daily') list.sort((a,b) => b.dailyXp - a.dailyXp);
+      else list.sort((a,b) => b.xp - a.xp);
+
+      if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" class="py-6 px-3 text-center text-gray-400">No real tracked members yet. Names will appear after messages are tracked by the dashboard bot.</td></tr>'; return; }
+      list.forEach((u, i) => {
+        const tr = document.createElement('tr');
+        const score = type==='weekly' ? (u.weeklyXp || 0) : type==='daily' ? (u.dailyXp || 0) : (u.xp || 0);
+        tr.innerHTML = `<td class="py-2 px-3 font-bold">#${i+1}</td><td class="py-2 px-3 text-white">${escapeHtml(u.username || 'Unknown member')}</td><td class="py-2 px-3 text-indigo-400 font-bold">${u.level || 1}</td><td class="py-2 px-3 font-mono">${score} XP</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function saveWelcomeSettings() {
+      const payload = {
+        welcome: {
+          enabled: document.getElementById('welcomeEnabled').checked,
+          channelId: document.getElementById('welcomeChannel').value,
+          message: document.getElementById('welcomeMsg').value
+        },
+        leave: {
+          enabled: document.getElementById('leaveEnabled').checked,
+          channelId: document.getElementById('leaveChannel').value,
+          message: document.getElementById('leaveMsg').value
+        }
+      };
+      await fetch(`/api/guilds/${appState.activeGuild.id}/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      showToast('Welcome/Leave saved!', 'success', 'SAVED SUCCESSFULLY');
+    }
+
+    async function saveServerLogChannel() {
+      const logsChannelId = document.getElementById('serverLogChannel').value;
+      await fetch(`/api/guilds/${appState.activeGuild.id}/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ logsChannelId })
+      });
+      showToast('Log channel updated!', 'success', 'SAVED SUCCESSFULLY');
+    }
+
+    async function saveGeneralSettings() {
+      const prefix = document.getElementById('settingsPrefix').value;
+      const accentColor = document.getElementById('settingsAccent').value;
+      await fetch(`/api/guilds/${appState.activeGuild.id}/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prefix, accentColor })
+      });
+      showToast('Bot preferences saved!', 'success', 'SAVED SUCCESSFULLY');
+    }
+
+    function addBuilderButton() {
+      const wrap=document.getElementById('mbButtons'); if(wrap.children.length>=5) return showToast('Maximum 5 link buttons.', 'error', 'NOTICE');
+      const row=document.createElement('div'); row.className='grid grid-cols-2 gap-2';
+      row.innerHTML='<input class="input-field text-xs mb-label" placeholder="Button label"><input class="input-field text-xs mb-url" placeholder="https://example.com">';
+      wrap.appendChild(row);
+    }
+    function addBuilderOption() {
+      const wrap=document.getElementById('mbOptions'); if(wrap.children.length>=25) return showToast('Maximum 25 dropdown options.', 'error', 'NOTICE');
+      const row=document.createElement('div'); row.className='grid grid-cols-3 gap-2';
+      row.innerHTML='<input class="input-field text-xs mo-label" placeholder="Label"><input class="input-field text-xs mo-value" placeholder="Value"><input class="input-field text-xs mo-desc" placeholder="Description">';
+      wrap.appendChild(row);
+    }
+    async function sendBuilderMessage() {
+      if(!appState.activeGuild) return showToast('Select a server first.', 'error', 'NOTICE');
+      const buttons=[...document.querySelectorAll('#mbButtons > div')].map(r=>({label:r.querySelector('.mb-label').value.trim(),url:r.querySelector('.mb-url').value.trim()})).filter(b=>b.label&&b.url);
+      for(const b of buttons){try{const u=new URL(b.url);if(!['http:','https:'].includes(u.protocol)) throw 0;}catch{return showToast('Link buttons need valid http/https URLs.', 'error', 'NOTICE');}}
+      const opts=[...document.querySelectorAll('#mbOptions > div')].map((r,i)=>({label:r.querySelector('.mo-label').value.trim(),value:r.querySelector('.mo-value').value.trim()||`option_${i+1}`,description:r.querySelector('.mo-desc').value.trim()})).filter(o=>o.label);
+      const res=await fetch(`/api/guilds/${appState.activeGuild.id}/messages/send`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelId:document.getElementById('mbChannel').value,content:document.getElementById('mbContent').value,title:document.getElementById('mbTitle').value,description:document.getElementById('mbDescription').value,color:document.getElementById('mbColor').value,buttons,dropdown:opts.length?{placeholder:document.getElementById('mbDropdownPlaceholder').value,options:opts}:null})});
+      const data=await res.json(); showToast(data.success?'Message sent to Discord.':(data.error||'Could not send message.'), data.success?'success':'error', data.success?'MESSAGE SENT':'MESSAGE FAILED');
+    }
+    function updateEmbedPreview(){document.getElementById('ebPreview').style.borderLeft='4px solid '+document.getElementById('ebColor').value;document.getElementById('ebPreviewTitle').textContent=document.getElementById('ebTitle').value||'Embed preview';document.getElementById('ebPreviewDesc').textContent=document.getElementById('ebDescription').value||'Your description appears here.';document.getElementById('ebPreviewFooter').textContent=document.getElementById('ebFooter').value;}
+    ['ebTitle','ebDescription','ebFooter','ebColor'].forEach(id=>document.getElementById(id)?.addEventListener('input',updateEmbedPreview));
+    async function sendEmbedBuilder(){
+      if(!appState.activeGuild)return showToast('Select a server first.','error','NO SERVER SELECTED');
+      const res=await fetch(`/api/guilds/${appState.activeGuild.id}/messages/send`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelId:document.getElementById('ebChannel').value,title:document.getElementById('ebTitle').value,description:document.getElementById('ebDescription').value,color:document.getElementById('ebColor').value,footer:document.getElementById('ebFooter').value})});
+      const data=await res.json();showToast(data.success?'Embed sent to Discord.':(data.error||'Could not send embed.'), data.success?'success':'error', data.success?'EMBED SENT':'EMBED FAILED');
+    }
+
+    function switchTab(viewId, navEl) {
+      document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(`view-${viewId}`);
+      if (target) target.classList.remove('hidden');
+      (navEl || document.querySelector(`.nav-link[onclick*=\"${viewId}\"]`))?.classList.add('active');
+      document.getElementById('pageTitle').innerText = (navEl || document.querySelector(`.nav-link[onclick*=\"${viewId}\"]`))?.innerText.trim() || viewId;
+      lucide.createIcons();
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('hidden');
+      } else {
+        sidebar.classList.toggle('md:hidden');
+      }
+    }
+  </script>
+</body>
+</html>
